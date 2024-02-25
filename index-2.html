@@ -2,10 +2,20 @@
 
 <head>
     <meta name="viewport" content="minimal-ui, width=devicewidth, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.7.0/lib/p5.js"></script>
 </head>
 
 <body style="margin: 0;">
+    <nav class="navbar" style="top: 0; left: 0;">
+        <div class="container-fluid">
+            <div class="navbar-header" style="background-color: aliceblue; width: fit-content;">
+                <img  width="100px" src="filename.svg"/>
+            </div>
+        </div>
+    </nav>
     <script type="text/javascript">
         // define variables
         let gridSize, cols, rows;
@@ -19,7 +29,7 @@
         // }
         function setup() {
             canvas = createCanvas(displayWidth, displayHeight);
-            canvas.position(0,0);
+            canvas.position(0, 0);
             canvas.style('z-index', '-1');
             background(0);
             ellipseMode(CENTER);
@@ -34,7 +44,7 @@
             for (let y = 0; y < rows; y++) {
                 flowField[y] = [];
                 for (let x = 0; x < cols; x++) {
-                    let angle = noise(x/(noiseResolution/2), y/(noiseResolution/2)) * TWO_PI * 4;
+                    let angle = noise(x / (noiseResolution / 2), y / (noiseResolution / 2)) * TWO_PI * 4;
                     // if (x <= cols / 5) {
                     //     angle = noise(0, 0) * TWO_PI * 4;
                     // }
