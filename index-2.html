@@ -28,7 +28,7 @@
             for (let y = 0; y < rows; y++) {
                 flowField[y] = [];
                 for (let x = 0; x < cols; x++) {
-                    let angle = noise(0.1*x, 0.1*y) * TWO_PI * 4;
+                    let angle = noise(x/(noiseResolution/2), y/(noiseResolution/2)) * TWO_PI * 4;
                     // if (x <= cols / 5) {
                     //     angle = noise(0, 0) * TWO_PI * 4;
                     // }
