@@ -1,0 +1,141 @@
+<html>
+
+<head>
+    <meta name="viewport" content="minimal-ui, width=devicewidth, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.7.0/lib/p5.js"></script>
+</head>
+
+<body style="margin: 0;">
+    <script type="text/javascript">
+        // define variables
+        let gridSize, cols, rows;
+        let noiseResolution;
+        let flowField = [];
+        // add a data structure to hold all particles
+        let particles = [];
+        function setup() {
+            createCanvas(displayWidth, displayHeight);
+            background(255);
+            ellipseMode(CENTER);
+            // define the grid size
+            gridSize = 10;
+            // calculate the number of columns and rows
+            cols = floor(width / gridSize);
+            rows = floor(height / gridSize);
+            // define noise resolution
+            noiseResolution = 180;
+            // create 2D array of vectors based on Perlin noise
+            for (let y = 0; y < rows; y++) {
+                flowField[y] = [];
+                for (let x = 0; x < cols; x++) {
+                    let angle = noise(0.1*x, 0.1*y) * TWO_PI * 4;
+                    // if (x <= cols / 5) {
+                    //     angle = noise(0, 0) * TWO_PI * 4;
+                    // }
+                    // else {
+                    //     angle = noise(x/(noiseResolution/2), y/(noiseResolution/2)) * TWO_PI * 4;
+                    // }
+                    let v = p5.Vector.fromAngle(angle);
+                    flowField[y][x] = v;
+                }
+            }
+            // create 2D array of vectors based on Perlin noise
+            // for (let y = 0; y < rows; y++) {
+            //     flowField[y] = [];
+            //     for (let x = 0; x < cols; x++) {
+            //         let angle = noise(x / noiseResolution,
+            //             y / noiseResolution) * TWO_PI * 4;
+            //         let v = p5.Vector.fromAngle(angle);
+            //         flowField[y][x] = v;
+            //         // add a new particle in the center of the grid cell
+            //         particles.push(new Particle(x * gridSize +
+            //             gridSize / 2, y * gridSize + gridSize / 2));
+            //     }
+            // }
+            // create a single particle at the end
+            particles.push(new Particle());
+            for (let i = 0; i < 400; i++) {
+                particles.push(new Particle());
+            }
+            // call the function to draw the grid
+            //drawGrid();
+        }
+
+
+
+        function draw() {
+            // update and display each particle
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update(flowField);
+                particles[i].display();
+            }
+        }
+        class Particle {
+            // create the particle
+            constructor(x, y) {
+                this.pos = createVector(x ? x : random(width), y ? y : random(height));
+                this.vel = createVector(0, 0);
+                this.acc = createVector(0, 0);
+            }
+            // update position of the particle
+            update(flowField) {
+                // determine grid index from position
+                let x = constrain(floor(this.pos.x / gridSize), 0, rows - 1);
+                let y = constrain(floor(this.pos.y / gridSize), 0, cols - 1);
+                // get vector from flow field and apply as force
+                this.acc.add(flowField[x][y]);
+                // NEW: add random rotation to acceleration vector
+                //this.acc.rotate(radians(random(-45, 45)));
+                // change direction of particle
+                this.vel.add(this.acc);
+                this.vel.normalize();
+                this.vel.mult(2);
+                this.pos.add(this.vel);
+                // clear acceleration for next cycle
+                this.acc.mult(0);
+            }
+            // show the particle
+            // display() {
+            //     fill(0, 50);
+            //     stroke(0, 50);
+            //     strokeWeight(1);
+            //     ellipse(this.pos.x, this.pos.y, 1, 1);
+            // }
+            // show the particle
+            display() {
+                colorMode(HSB);
+                angleMode(DEGREES)
+                let angle0To360 = (this.vel.heading() + 360) % 360;
+                fill(map(angle0To360, 0, 360, 0, 255), 200, 200, 50)
+                stroke(map(angle0To360, 0, 360, 0, 255), 200, 200, 50)
+                strokeWeight(1)
+                ellipse(this.pos.x, this.pos.y, 1, 1);
+            }
+        }
+        function drawGrid() {
+            // draw lines following vectors on the grid
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    let v = flowField[y][x];
+                    push();
+                    // Transform to grid-space
+                    translate(x * gridSize, y * gridSize);
+                    // draw cell
+                    fill(240);
+                    noStroke()
+                    rect(1, 1, gridSize - 2, gridSize - 2)
+                    // move to center of cell
+                    translate(gridSize / 2, gridSize / 2);
+                    // draw direction
+                    stroke(0, 120);
+                    strokeWeight(1);
+                    line(0, 0, v.x * gridSize / 2, v.y * gridSize / 2);
+                    pop();
+                }
+            }
+        }
+
+    </script>
+</body>
+
+</html>

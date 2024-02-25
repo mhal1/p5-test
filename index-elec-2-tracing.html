@@ -1,0 +1,268 @@
+<html>
+
+<head>
+    <meta name="viewport" content="minimal-ui, width=devicewidth, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.7.0/lib/p5.js"></script>
+</head>
+
+<body style="margin: 0;">
+    <script type="text/javascript">
+        let particles = [];
+        let paths = [];
+
+        function setup() {
+            createCanvas(displayWidth, displayHeight);
+
+            // Create four particles with random starting positions
+            for (let i = 0; i < 8; i++) {
+                particles.push(new Particle(random(width), random(height)));
+            }
+        }
+
+        function draw() {
+            background(255);
+
+            for (let i = 0; i < particles.length; i++) {
+                // Update and display each particle
+                particles[i].update();
+                particles[i].display();
+
+                // Record the path of each particle
+                paths[i] = paths[i] || [];
+                paths[i].push(createVector(particles[i].pos.x, particles[i].pos.y));
+
+                // Draw the path of each particle
+                drawPath(paths[i]);
+            }
+
+            // Check if all particles have reached the top of the canvas
+            let allParticlesAtTop = particles.every(particle => particle.pos.y <= 0);
+            if (allParticlesAtTop) {
+                // Clear the canvas and reset the paths array
+                clear();
+                paths = [];
+
+                // Reset the particles to their initial positions
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].reset(random(width), random(height));
+                }
+            }
+        }
+
+        function drawPath(path) {
+            noFill();
+            beginShape();
+            stroke(0, 50); // Semi-transparent black color for paths
+            for (let point of path) {
+                vertex(point.x, point.y);
+            }
+            endShape();
+        }
+
+        class Particle {
+            constructor(x, y) {
+                this.startX = x; // Initial x position
+                this.startY = y; // Initial y position
+                this.pos = createVector(x, y); // Current position
+                this.vel = createVector(0, 0); // Initial velocity
+                this.acc = createVector(0, 0); // Initial acceleration
+                this.finishedHorizontal = false; // Flag to indicate if the horizontal movement is finished
+                this.finished = false; // Flag to indicate if the particle has finished its path
+            }
+
+            update() {
+                if (!this.finishedHorizontal) {
+                    // Move horizontally towards the center
+                    let targetX = width / 2;
+                    let dirX = targetX - this.pos.x;
+                    this.vel.x = dirX > 0 ? 1 : -1;
+                    this.pos.x += this.vel.x;
+
+                    // Check if the particle has reached the center horizontally
+                    if (abs(targetX - this.pos.x) < 1) {
+                        this.finishedHorizontal = true;
+                        // Start moving vertically towards the top
+                        this.vel.set(0, -1);
+                    }
+                } else {
+                    // Move vertically towards the top
+                    this.pos.y += this.vel.y;
+
+                    // Check if the particle has reached the top
+                    if (this.pos.y <= 0) {
+                        this.finished = true;
+                    }
+                }
+            }
+
+
+
+
+
+            // display() {
+            //     stroke(255, 0, 0); // Red color
+            //     strokeWeight(8);
+            //     point(this.pos.x, this.pos.y);
+            // }
+
+            display() {
+                stroke(255, 0, 0); // Red color for particle
+                strokeWeight(8);
+                point(this.pos.x, this.pos.y); // Draw the particle
+
+                // Draw a circle at the start point of the particle
+                noStroke();
+                fill(255, 0, 0); // Red color for circle
+                ellipse(this.startX, this.startY, 16, 16); // Draw a circle at the start point
+            }
+
+
+            // reset(x, y) {
+            //     this.pos.x = x;
+            //     this.pos.y = y;
+            //     this.finishedHorizontal = false;
+            //     this.finished = false;
+            // }
+
+            reset(x, y) {
+                this.pos.x = x;
+                this.pos.y = y;
+                this.finishedHorizontal = false;
+                this.finished = false;
+                this.vel.set(2, 0); // Reset velocity for horizontal movement
+
+                // Reset the start position of the particle
+                this.startX = x;
+                this.startY = y;
+            }
+
+        }
+
+
+
+
+        // let particles = [];
+        // let paths = [];
+
+        // function setup() {
+        //     createCanvas(displayWidth, displayHeight);
+        //     particles.push(new Particle(0, height / 2)); // Create the first particle starting from the left
+        //     particles.push(new Particle(0, height / 2 + 10)); // Create the second particle starting from the left, below the first one
+        //     particles.push(new Particle(0, height / 2 + 20));
+        //     particles.push(new Particle(0, height / 2 + 30));
+        // }
+
+        // function draw() {
+        //     background(255);
+
+        //     for (let i = 0; i < particles.length; i++) {
+        //         // Update and display each particle
+        //         particles[i].update();
+        //         particles[i].display();
+
+        //         // Record the path of each particle
+        //         paths[i] = paths[i] || [];
+        //         paths[i].push(createVector(particles[i].pos.x, particles[i].pos.y));
+
+        //         // Draw the path of each particle
+        //         drawPath(paths[i]);
+        //     }
+
+        //     // Check if all particles have finished their path
+        //     let allFinished = particles.every(particle => particle.finished);
+        //     console.log(allFinished); // Debugging output
+        //     // Stop moving up when reaching the top
+        //     let allParticlesAtTop = particles.every(particle => particle.pos.y <= 0);
+
+        //     // If all particles have reached the top, restart animation
+        //     if (allParticlesAtTop) {
+        //         // Clear the canvas and reset the paths array
+        //         clear();
+        //         paths = [];
+
+        //         // Reset the particles
+        //         particles.forEach(particle => {
+        //             particle.reset();
+        //         });
+        //     }
+        //     if (allFinished) {
+        //         console.log("All particles finished!"); // Debugging output
+        //         // Clear the canvas and reset the paths array
+        //         clear();
+        //         paths = [];
+
+        //         // Reset the particles
+        //         particles.forEach(particle => {
+        //             particle.reset();
+        //         });
+        //     }
+        // }
+
+        // function drawPath(path) {
+        //     noFill();
+        //     beginShape();
+        //     stroke(0, 50); // Semi-transparent black color for paths
+        //     for (let point of path) {
+        //         vertex(point.x, point.y);
+        //     }
+        //     endShape();
+        // }
+
+        // class Particle {
+        //     constructor(x, y) {
+        //         this.startX = x; // Initial x position
+        //         this.startY = y; // Initial y position
+        //         this.pos = createVector(x, y); // Current position
+        //         this.vel = createVector(2, 0); // Initial velocity (to the right)
+        //         this.acc = createVector(0, 0); // Initial acceleration
+        //         this.isHalfway = false; // Flag to indicate if the particle is halfway across
+        //         this.finished = false; // Flag to indicate if the particle has finished its path
+        //     }
+
+        //     update() {
+        //         if (!this.finished) {
+        //             this.pos.add(this.vel);
+        //             this.vel.add(this.acc);
+
+        //             // Check if the particle has reached halfway across
+        //             if (this.pos.x >= width / 2 && !this.isHalfway) {
+        //                 this.vel.set(0, -2); // Change velocity to move up
+        //                 this.isHalfway = true;
+        //             }
+
+        //             // Check if the particle has reached the end of the canvas
+        //             if (this.pos.x >= width && this.isHalfway) {
+        //                 this.finished = true; // Set the finished flag
+
+        //             }
+
+        //             // Stop moving up when reaching the top
+        //             if (this.pos.y <= 0) {
+        //                 this.vel.set(0, 0);
+        //                 //this.reset();
+        //             }
+        //         }
+        //     }
+
+
+
+        //     display() {
+        //         stroke(0, 0, 255); // Red color
+        //         strokeWeight(8);
+        //         point(this.pos.x, this.pos.y);
+        //     }
+
+        //     reset() {
+        //         paths = [];
+        //         this.pos.x = this.startX; // Reset x position to the starting point
+        //         this.pos.y = this.startY; // Reset y position to the starting point
+        //         this.vel.set(2, 0); // Reset velocity to move to the right
+        //         this.isHalfway = false; // Reset the halfway flag
+        //         this.finished = false; // Reset the finished flag
+        //     }
+        // }
+
+    </script>
+</body>
+
+</html>
