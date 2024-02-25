@@ -13,9 +13,15 @@
         let flowField = [];
         // add a data structure to hold all particles
         let particles = [];
+        function windowResized(){
+            resizeCanvas(displayWidth, displayHeight);
+            background(0);
+        }
         function setup() {
-            createCanvas(displayWidth, displayHeight);
-            background(255);
+            canvas = createCanvas(displayWidth, displayHeight);
+            canvas.position(0,0);
+            canvas.style('z-index', '-1');
+            background(0);
             ellipseMode(CENTER);
             // define the grid size
             gridSize = 10;
