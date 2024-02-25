@@ -99,9 +99,10 @@
         //     background(0);
         // }
         function setup() {
-            canvas = createCanvas(displayWidth, displayHeight);
+            canvas = createCanvas(windowWidth, windowHeight);
             canvas.position(0, 0);
             canvas.style('z-index', '-1');
+            canvas.style('height', '100vh');
             background(0);
             ellipseMode(CENTER);
             // define the grid size
